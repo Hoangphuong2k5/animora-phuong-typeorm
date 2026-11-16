@@ -1,0 +1,78 @@
+// ============================================================================
+// PATCH — đăng ký entity mới trong team backend (PHƯƠNG, 26 UC).
+// File đích: Nhom-14/backend/src/config/data-source.js
+// Đây là HƯỚNG DẪN ÁP DỤNG, không chạy trực tiếp vào repo. Copy các dòng dưới
+// đây vào file đích theo đúng vị trí đã ghi. Giữ nguyên mọi dòng cũ.
+// ============================================================================
+//
+// 1) Thêm các dòng require sau vào đầu file (sau dòng require service.entity):
+//
+// const { PetEntity, PetVaccinationEntity, AuditLogEntity } = require('../entities/pet.entity');
+// const { ProductEntity, ProductCategoryEntity } = require('../entities/product.entity');
+// const { MedicalRecordEntity } = require('../entities/medical.entity');
+// const { PrescriptionEntity, PrescriptionItemEntity } = require('../entities/prescription.entity');
+// const { ReviewEntity } = require('../entities/review.entity');
+// const { PaymentEntity } = require('../entities/payment.entity');
+// const { AdoptionPostEntity, AdoptionApplicationEntity } = require('../entities/adoption.entity');
+// const { MedicineSuggestionEntity } = require('../entities/medicine-suggestion.entity');
+//
+// 2) Thêm các entity sau vào mảng `entities` (giữ nguyên các entity cũ
+//    UserEntity, AddressEntity, PasswordResetTokenEntity, ServiceEntity,
+//    ExpertServiceEntity):
+//
+//   entities: [
+//     UserEntity,
+//     AddressEntity,
+//     PasswordResetTokenEntity,
+//     ServiceEntity,
+//     ExpertServiceEntity,
+//     // --- Phần của Phương (26 UC) ---
+//     PetEntity,              // PET-01/02/03/05 — bảng pets
+//     PetVaccinationEntity,   // PET-05 — bảng pet_vaccinations
+//     AuditLogEntity,         // PET-02, PRD-05 — bảng audit_logs
+//     ProductEntity,          // PRD-01/02/04/05 — bảng products
+//     ProductCategoryEntity,  // PRD-03 — bảng product_categories
+//     MedicalRecordEntity,    // MED-01/02/03, PET-07 — bảng medical_records
+//     PrescriptionEntity,     // MED-04/05/06/07/08 — bảng prescriptions
+//     PrescriptionItemEntity, // MED-04/05/06/07/08 — bảng prescription_items
+//     ReviewEntity,           // RVW-01/02 — bảng expert_reviews
+//     PaymentEntity,          // SPAY-05 — bảng payments
+//     AdoptionPostEntity,     // ADP-08/09/10/11 — bảng adoption_posts
+//     AdoptionApplicationEntity, // ADP-08/09/10/11 — bảng adoption_applications
+//     MedicineSuggestionEntity,  // MED-09 — bảng medicine_suggestions (*)
+//   ],
+//
+// (*) MedicineSuggestionEntity map tới bảng medicine_suggestions — bảng này
+//     KHÔNG có trong schema gốc animora-sqlserver-v0_1.sql (v1.6). Phải chạy
+//     file docs/migration-medicine-suggestions.sql trên database Animora TRƯỚC
+//     khi khởi động server, nếu không TypeORM sẽ lỗi "bảng không tồn tại" khi
+//     gọi endpoint MED-09. synchronize: false trong data-source.js nên TypeORM
+//     sẽ KHÔNG tự tạo bảng — mọi bảng khác đã có sẵn từ file schema v1.6.
+//
+// 3) Các file cần copy từ thư mục chuyển đổi này vào repo (giữ đúng layout src/):
+//    - src/entities/: pet.entity.js, product.entity.js, medical.entity.js,
+//      prescription.entity.js, review.entity.js, payment.entity.js,
+//      adoption.entity.js, medicine-suggestion.entity.js
+//    - src/repositories/: pet.repository.js, product.repository.js,
+//      medical.repository.js, prescription.repository.js, review.repository.js,
+//      cash-payment.repository.js, adoption.repository.js,
+//      medicine-suggestion.repository.js
+//    - src/services/: pet.service.js, product.service.js, medical.service.js,
+//      prescription.service.js, review.service.js, cash-payment.service.js,
+//      adoption.service.js, medicine-suggestion.service.js
+//    - src/controllers/: pet.controller.js, product.controller.js,
+//      medical.controller.js, prescription.controller.js, review.controller.js,
+//      cash-payment.controller.js, adoption.controller.js,
+//      medicine-suggestion.controller.js
+//    - src/validators/: pet.validator.js, product.validator.js,
+//      medical.validator.js, prescription.validator.js, review.validator.js,
+//      cash-payment.validator.js, adoption.validator.js,
+//      medicine-suggestion.validator.js
+//    - src/routes/: pet.route.js, product.route.js, medical.route.js,
+//      prescription.route.js, review.route.js, cash-payment.route.js,
+//      adoption.route.js, medicine-suggestion.route.js
+//    - src/middlewares/vet.middleware.js (file mới, xem routes-index.patch.txt)
+//    - docs/migration-medicine-suggestions.sql -> Nhom-14/backend/docs/
+//    - PHUONG-CONVERSION.md (ghi chú, không bắt buộc copy vào repo)
+//
+// 4) Không cần cài thêm thư viện: repo đã có typeorm, joi, express, jsonwebtoken.

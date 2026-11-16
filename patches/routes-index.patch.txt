@@ -1,0 +1,68 @@
+// ============================================================================
+// PATCH — gắn route phần của Phương (26 UC) vào team backend.
+// File đích: Nhom-14/backend/src/routes/index.js
+// Đây là HƯỚNG DẪN ÁP DỤNG, không chạy trực tiếp vào repo. Copy các dòng dưới
+// đây vào file đích theo đúng vị trí đã ghi. Giữ nguyên mọi route cũ.
+// Không cần sửa app.js / server.js — routes/index.js đã được gắn sẵn ở /api/v1.
+// ============================================================================
+//
+// 1) Thêm các dòng require sau vào đầu file (sau dòng require service.route):
+//
+// const petRoute = require('./pet.route');
+// const productRoute = require('./product.route');
+// const medicalRoute = require('./medical.route');
+// const prescriptionRoute = require('./prescription.route');
+// const reviewRoute = require('./review.route');
+// const cashPaymentRoute = require('./cash-payment.route');
+// const adoptionRoute = require('./adoption.route');
+// const medicineSuggestionRoute = require('./medicine-suggestion.route');
+//
+// 2) Thêm các dòng gắn route sau vào cuối file (sau dòng router.use('/services', ...)):
+//
+// // [PET-01, 02, 03, 05] Pet Routes: /api/v1/pets
+// router.use('/pets', petRoute);
+//
+// // [PRD-01..05] Product & Category Routes: /api/v1/products, /api/v1/categories,
+// // /api/v1/admin/products, /api/v1/admin/categories
+// // (product.route.js mang đủ đường dẫn trong file nên gắn trực tiếp, không tiền tố)
+// router.use(productRoute);
+//
+// // [MED-01, 02, 03] Vet Medical Routes: /api/v1/vet/...
+// // [PET-07] Pet Medical History: /api/v1/pets/:id/medical-records
+// router.use(medicalRoute);
+//
+// // [MED-04..08] Prescription Routes: /api/v1/vet/prescriptions, /api/v1/prescriptions
+// router.use(prescriptionRoute);
+//
+// // [RVW-01, 02] Review Routes: /api/v1/bookings/:id/review, /api/v1/experts/:id/reviews
+// router.use(reviewRoute);
+//
+// // [SPAY-05] Cash Payment Route: /api/v1/experts/me/bookings/:id/cash-payment
+// router.use(cashPaymentRoute);
+//
+// // [ADP-08..11] Adoption Routes: /api/v1/shelters/me/adoption-applications,
+// // /api/v1/adoption-applications/:id/create-pet
+// router.use(adoptionRoute);
+//
+// // [MED-09] Medicine Suggestion Routes: /api/v1/medicine-suggestions
+// // (cần chạy migration docs/migration-medicine-suggestions.sql trước)
+// router.use(medicineSuggestionRoute);
+//
+// 3) Thêm file middleware mới (copy từ thư mục chuyển đổi):
+//    src/middlewares/vet.middleware.js — kiểm tra bác sĩ đã duyệt cho các
+//    route /vet/... (medical.route.js, prescription.route.js dùng file này).
+//    Không sửa các middleware cũ.
+//
+// 4) (Tùy chọn, cho đồng nhất) Thêm role shelter vào src/utils/constants.js:
+//    ROLES hiện chỉ có ADMIN, STAFF, EXPERT, CUSTOMER. dbo.users.role có thêm
+//    'shelter' (trạm cứu hộ) nhưng ROLES chưa có. adoption.route.js hiện dùng
+//    chuỗi 'shelter' trực tiếp nên vẫn chạy được nếu không thêm; nếu nhóm thêm
+//    SHELTER: 'shelter' vào ROLES thì đổi authorizeRoles('shelter') thành
+//    authorizeRoles(ROLES.SHELTER) trong adoption.route.js.
+//
+// 5) Thứ tự gắn route không ảnh hưởng lẫn nhau vì tiền tố/đường dẫn không trùng.
+//    Lưu ý: product.route.js, medical.route.js, prescription.route.js,
+//    review.route.js, cash-payment.route.js, adoption.route.js và
+//    medicine-suggestion.route.js đều gắn trực tiếp (không tiền tố) vì các file
+//    này đã khai báo đủ đường dẫn tuyệt đối trong nội bộ (giống cách bản
+//    node-mssql cũ mount các routes này ở /api/v1).
